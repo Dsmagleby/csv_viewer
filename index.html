@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>CSV Viewer</title>
+</head>
+<body>
+    <div>
+    <p>
+        <input type="file" name="" id="csvInput" style="padding-bottom: 1px; margin-right: 10px">
+        <button id="csvExport">Export csv</button>
+    </p>
+    <p>
+        Search: 
+        <select id="selectColumn">
+            <option>Choose a column</option>
+        </select>
+        <select id="conditionalSearch">
+            <option value='match'>Partial match</option>
+            <option value='eq'>Equal to</option>
+            <option value='neq'>Not equal to</option>
+            <option value='gt'>Greater than</option>
+            <option value='lt'>Less than</option>
+        </select>
+        <input type="text" id="searchBar" placeholder="Search">
+    </p>
+
+
+    <table id="mainTable"></table>
+    </div>
+    <script src="./lib/papaparse.min.js"></script>
+    <script type="module" src="./main.js"></script>
+
+    <script src="./lib/tableExport.js"></script>
+        <script>
+            const outTable = document.getElementById("mainTable");
+            const btnExportToCsv = document.getElementById("csvExport");
+
+            btnExportToCsv.addEventListener("click", () => {
+            const exporter = new TableCSVExporter(outTable);
+            const csvOutput = exporter.convertToCSV();
+            const csvBlob = new Blob([csvOutput], { type: "text/csv" });
+            const blobUrl = URL.createObjectURL(csvBlob);
+            const anchorElement = document.createElement("a");
+
+            anchorElement.href = blobUrl;
+            anchorElement.download = "export.csv";
+            anchorElement.click();
+
+            setTimeout(() => {
+                URL.revokeObjectURL(blobUrl);
+            }, 500);
+        });
+    </script>
+</body>
+</html>
