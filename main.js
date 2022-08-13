@@ -10,6 +10,8 @@ var tableBody;
 var rows = [];
 var headerIndex = 0;
 var conditionIndex = 'match';
+var tableData = [];
+var secondTableData = []; // save data, such that reset is possible
 
 
 csvInput.addEventListener("change", function() {
@@ -17,8 +19,11 @@ csvInput.addEventListener("change", function() {
         delimiter: ",",
         skipEmptyLines: true,
         complete: results => {
+            tableData = results.data;
+            secondTableData = results.data;
             csvTable.update(results.data[0], results.data.slice(1));
             headers = csvTable.table.querySelectorAll('th');
+
 
             // Loop over the headers
             [].forEach.call(headers, function (header, index) {
@@ -33,7 +38,9 @@ csvInput.addEventListener("change", function() {
             // Populate dropdown with headers
             updateDropdown();
             // ensure the header selected works imidately after loading the table
+            // probably not really needed
             onChange_header();
+            onChange_viewMode();
         }
 
     });
@@ -44,91 +51,99 @@ csvInput.addEventListener("change", function() {
 const searchBar = document.getElementById('searchBar');
 
 // Searchbar, only active if csv file has been loaded
-searchBar.addEventListener('keyup', function () {
-    var filter, tr, td, i, txtValue;
-    filter = searchBar.value;
-    headerIndex = 0;
-    if (csvTable.table !== null) { 
-        tr = csvTable.table.getElementsByTagName("tr");
+searchBar.addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
 
-        if (conditionIndex === 'match') {
-            for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[headerIndex];
-                if (td) {
-                    txtValue = td.textContent || td.innerText;
-                    if (txtValue.indexOf(filter) > -1) {
-                        tr[i].style.display = "";
-                    } else {
-                        tr[i].style.display = "none";
+        var filter, tr, td, i, txtValue;
+        filter = searchBar.value;
+        var tempList = [];
+        
+        // reset the table for new search
+        csvTable.update(secondTableData[0], secondTableData.slice(1));
+
+        if (csvTable.table !== null) { 
+            tr = csvTable.table.getElementsByTagName("tr");
+
+            if (conditionIndex === 'match') {
+                for (i = 0; i < tr.length; i++) {
+                    td = tr[i].getElementsByTagName("td")[headerIndex];
+                    if (td) {
+                        txtValue = td.textContent || td.innerText;
+                        if (txtValue.indexOf(filter) > -1) {
+                            //r[i].style.display = "";
+                            tempList.push(secondTableData.slice(1)[i-1]);
+                        } 
                     }
                 }
-            }
-        } else if (conditionIndex === 'lt') {
-            for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[headerIndex];
-                if (td) {
-                    txtValue = td.textContent || td.innerText;
-                    if (filter !== "" && !isNaN(filter/1)) {
-                        if (txtValue/1 < filter/1) {
-                            tr[i].style.display = "";
-                        } else {
-                            tr[i].style.display = "none";
+                csvTable.update(tableData[0], tempList);
+
+            } else if (conditionIndex === 'lt') {
+                for (i = 0; i < tr.length; i++) {
+                    td = tr[i].getElementsByTagName("td")[headerIndex];
+                    if (td) {
+                        txtValue = td.textContent || td.innerText;
+                        if (filter !== "" && !isNaN(filter/1)) {
+                            if (txtValue/1 < filter/1) {
+                                //tr[i].style.display = "";
+                                tempList.push(secondTableData.slice(1)[i-1]);
+                            } 
+                        }   
+                    }
+                }
+                csvTable.update(tableData[0], tempList);
+
+            } else if (conditionIndex === 'gt') {
+                for (i = 0; i < tr.length; i++) {
+                    td = tr[i].getElementsByTagName("td")[headerIndex];
+                    if (td) {
+                        txtValue = td.textContent || td.innerText;
+                        if (filter !== "" && !isNaN(filter/1)) {
+                            if (txtValue/1 > filter/1) {
+                                //tr[i].style.display = "";
+                                tempList.push(secondTableData.slice(1)[i-1]);
+                            }
+                        }   
+                    }
+                }
+                csvTable.update(tableData[0], tempList);
+
+            } else if (conditionIndex === 'neq') {
+                for (i = 0; i < tr.length; i++) {
+                    td = tr[i].getElementsByTagName("td")[headerIndex];
+                    if (td) {
+                        txtValue = td.textContent || td.innerText;
+                        if (filter !== "" && !isNaN(filter/1)) {
+                            if (txtValue/1 !== filter/1) {
+                                //tr[i].style.display = "";
+                                tempList.push(secondTableData.slice(1)[i-1]);
+                            }
                         }
-                    } else {
-                        tr[i].style.display = "none";
                     }
                 }
-            }
-        } else if (conditionIndex === 'gt') {
-            for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[headerIndex];
-                if (td) {
-                    txtValue = td.textContent || td.innerText;
-                    if (filter !== "" && !isNaN(filter/1)) {
-                        if (txtValue/1 > filter/1) {
-                            tr[i].style.display = "";
-                        } else {
-                            tr[i].style.display = "none";
+                csvTable.update(tableData[0], tempList);
+
+            } else if (conditionIndex === 'eq') {
+                for (i = 0; i < tr.length; i++) {
+                    td = tr[i].getElementsByTagName("td")[headerIndex];
+                    if (td) {
+                        txtValue = td.textContent || td.innerText;
+                        if (filter !== "" && !isNaN(filter/1)) {
+                            if (txtValue/1 === filter/1) {
+                                //tr[i].style.display = "";
+                                tempList.push(secondTableData.slice(1)[i-1]);
+                            } 
                         }
-                    } else {
-                        tr[i].style.display = "none";
                     }
                 }
+                csvTable.update(tableData[0], tempList);
             }
-        } else if (conditionIndex === 'neq') {
-            for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[headerIndex];
-                if (td) {
-                    txtValue = td.textContent || td.innerText;
-                    if (filter !== "" && !isNaN(filter/1)) {
-                        if (txtValue/1 !== filter/1) {
-                            tr[i].style.display = "";
-                        } else {
-                            tr[i].style.display = "none";
-                        }
-                    } else {
-                        tr[i].style.display = "none";
-                    }
-                }
-            }
-        } else if (conditionIndex === 'eq') {
-            for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[headerIndex];
-                if (td) {
-                    txtValue = td.textContent || td.innerText;
-                    if (filter !== "" && !isNaN(filter/1)) {
-                        if (txtValue/1 === filter/1) {
-                            tr[i].style.display = "";
-                        } else {
-                            tr[i].style.display = "none";
-                        }
-                    } else {
-                        tr[i].style.display = "none";
-                    }
-                }
-            }
+
         }
-     }
+        tableData = [tableData[0]].concat(tempList);
+        console.log(tableData);
+        console.log(secondTableData);
+    }
+    
 });
 
 
@@ -160,6 +175,76 @@ function onChange_condition() {
 }
 c.onchange = onChange_condition;
 onChange_condition();
+
+
+// change view mode of table
+var viewMode = document.getElementById("viewMode");
+function onChange_viewMode() {
+    
+    var tr;
+    if (csvTable.table !== null) { 
+        tr = csvTable.table.getElementsByTagName("tr");
+        var tableDataCopy = tableData;
+        if (viewMode.value === "table-all") {     
+            csvTable.update(tableData[0], tableData.slice(1));
+            tableData = tableDataCopy;
+            /* for (j = 0; j < tr.length; j++) {
+                td = tr[j].getElementsByTagName("td")[0];
+                if (td) {
+                    tr[j].style.display = "";
+                }
+            } */
+
+        } else if (viewMode.value === "table-head") {
+            csvTable.update(tableData[0], tableData.slice(1, 11));
+            tableData = tableDataCopy;
+            /* for (j = 0; j < tr.length; j++) {
+                td = tr[j].getElementsByTagName("td")[0];
+                if (td) {
+                    if (j <= tr.length - 11) {
+                        tr[j].style.display = "none";
+                    } else {
+                        tr[j].style.display = "";
+                    }
+                }
+            } */
+
+        } else if (viewMode.value === "table-tail") {
+            csvTable.update(tableData[0], tableData.slice(tableData.length - 11, tableData.length));
+            tableData = tableDataCopy;
+            /* for (j = 0; j < tr.length; j++) {
+                td = tr[j].getElementsByTagName("td")[0];
+                if (td) {
+                    if (j >= 11) {
+                        tr[j].style.display = "none";
+                    } else {
+                        tr[j].style.display = "";
+                    }
+                }
+            } */
+
+        } else if (viewMode.value === "table-preview") {
+            var firstFive = tableData.slice(1, 6);
+            var lastFive = tableData.slice(tableData.length - 6, tableData.length);
+            csvTable.update(tableData[0], firstFive.concat(lastFive));
+            tableData = tableDataCopy;
+            /* for (j = 0; j < tr.length; j++) {
+                td = tr[j].getElementsByTagName("td")[0];
+                if (td) {
+                    if (j >= tr.length - 5) {
+                        tr[j].style.display = "";
+                    } else if (j <= 5) {
+                        tr[j].style.display = "";
+                    } else {
+                        tr[j].style.display = "none";
+                    }
+                }
+            } */
+        }
+    }
+}
+viewMode.onchange = onChange_viewMode;
+onChange_viewMode();
 
 
 // Track the direction of sorting
