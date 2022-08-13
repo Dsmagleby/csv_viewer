@@ -38,6 +38,7 @@ csvInput.addEventListener("change", function() {
             // Populate dropdown with headers
             updateDropdown();
             // ensure the header selected works imidately after loading the table
+            // probably not really needed
             onChange_header();
             onChange_viewMode();
         }
@@ -243,7 +244,7 @@ function onChange_viewMode() {
     }
 }
 viewMode.onchange = onChange_viewMode;
-
+onChange_viewMode();
 
 
 // Track the direction of sorting
