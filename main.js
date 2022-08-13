@@ -139,9 +139,6 @@ searchBar.addEventListener('keypress', function (e) {
             }
 
         }
-        tableData = [tableData[0]].concat(tempList);
-        console.log(tableData);
-        console.log(secondTableData);
     }
     
 });
