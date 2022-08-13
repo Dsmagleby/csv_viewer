@@ -30,9 +30,18 @@
         </select>
         <input type="text" id="searchBar" placeholder="Search">
     </p>
+    <p>
+        View mode: 
+        <select id="viewMode">
+            <option value="table-all">All</option>
+            <option value='table-head'>First 10</option>
+            <option value='table-tail'>Last 10</option>
+            <option value='table-preview'>First 5 Last 5</option>
+        </select>
+    </p>
 
 
-    <table id="mainTable"></table>
+    <table class="table-all" id="mainTable"></table>
     <script src="./lib/papaparse.min.js"></script>
     <script type="module" src="./main.js"></script>
 
