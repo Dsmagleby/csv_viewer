@@ -26,11 +26,14 @@ csvInput.addEventListener("change", function() {
                     sortColumn(index);
                 });
             });
-
+   
             tableBody = csvTable.table.querySelector('tbody');
             rows = tableBody.querySelectorAll('tr');
            
+            // Populate dropdown with headers
             updateDropdown();
+            // ensure the header selected works imidately after loading the table
+            onChange_header();
         }
 
     });
@@ -44,9 +47,10 @@ const searchBar = document.getElementById('searchBar');
 searchBar.addEventListener('keyup', function () {
     var filter, tr, td, i, txtValue;
     filter = searchBar.value;
+    headerIndex = 0;
     if (csvTable.table !== null) { 
         tr = csvTable.table.getElementsByTagName("tr");
-        
+
         if (conditionIndex === 'match') {
             for (i = 0; i < tr.length; i++) {
                 td = tr[i].getElementsByTagName("td")[headerIndex];
@@ -224,7 +228,3 @@ function sortColumn(index) {
         tableBody.appendChild(newRow);
     });
 };
-
-
-
-

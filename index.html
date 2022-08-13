@@ -8,10 +8,13 @@
     <title>CSV Viewer</title>
 </head>
 <body>
-    <div>
     <p>
-        <input type="file" name="" id="csvInput" style="padding-bottom: 1px; margin-right: 10px">
-        <button id="csvExport">Export csv</button>
+        <input type="file" name="" id="csvInput">
+        <label for="csvInput" class="button_top">
+            Import csv
+        </label> 
+        
+        <button class="button_top" id="csvExport">Export csv</button>
     </p>
     <p>
         Search: 
@@ -30,7 +33,6 @@
 
 
     <table id="mainTable"></table>
-    </div>
     <script src="./lib/papaparse.min.js"></script>
     <script type="module" src="./main.js"></script>
 
