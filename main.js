@@ -23,23 +23,15 @@ csvInput.addEventListener("change", function() {
             secondTableData = results.data;
             csvTable.update(results.data[0], results.data.slice(1));
             headers = csvTable.table.querySelectorAll('th');
-
-
-            // Loop over the headers
-            [].forEach.call(headers, function (header, index) {
-                header.addEventListener('click', function () {
-                    sortColumn(index);
-                });
-            });
-   
-            tableBody = csvTable.table.querySelector('tbody');
-            rows = tableBody.querySelectorAll('tr');
            
             // Populate dropdown with headers
             updateDropdown();
             // ensure the header selected works imidately after loading the table
             // probably not really needed
             onChange_header();
+
+            // causes sorting header to not work
+            // applySorting(); has been added to onChange_viewMode();
             onChange_viewMode();
         }
 
@@ -76,6 +68,7 @@ searchBar.addEventListener('keypress', function (e) {
                     }
                 }
                 csvTable.update(tableData[0], tempList);
+                tableData = [tableData[0]].concat(tempList);
 
             } else if (conditionIndex === 'lt') {
                 for (i = 0; i < tr.length; i++) {
@@ -91,6 +84,7 @@ searchBar.addEventListener('keypress', function (e) {
                     }
                 }
                 csvTable.update(tableData[0], tempList);
+                tableData = [tableData[0]].concat(tempList);
 
             } else if (conditionIndex === 'gt') {
                 for (i = 0; i < tr.length; i++) {
@@ -106,6 +100,7 @@ searchBar.addEventListener('keypress', function (e) {
                     }
                 }
                 csvTable.update(tableData[0], tempList);
+                tableData = [tableData[0]].concat(tempList);
 
             } else if (conditionIndex === 'neq') {
                 for (i = 0; i < tr.length; i++) {
@@ -121,6 +116,7 @@ searchBar.addEventListener('keypress', function (e) {
                     }
                 }
                 csvTable.update(tableData[0], tempList);
+                tableData = [tableData[0]].concat(tempList);
 
             } else if (conditionIndex === 'eq') {
                 for (i = 0; i < tr.length; i++) {
@@ -136,12 +132,28 @@ searchBar.addEventListener('keypress', function (e) {
                     }
                 }
                 csvTable.update(tableData[0], tempList);
+                tableData = [tableData[0]].concat(tempList);
             }
 
         }
+        // Ensure view is constant also after searching
+        onChange_viewMode();
     }
     
 });
+
+
+function applySorting() {
+    headers = csvTable.table.querySelectorAll('th');
+    tableBody = csvTable.table.querySelector('tbody');
+    rows = tableBody.querySelectorAll('tr');
+
+    [].forEach.call(headers, function (header, index) {
+        header.addEventListener('click', function () {
+            sortColumn(index);
+        });
+    });
+}
 
 
 // Populate dropdown with headers
@@ -178,70 +190,34 @@ onChange_condition();
 var viewMode = document.getElementById("viewMode");
 function onChange_viewMode() {
     
-    var tr;
+
     if (csvTable.table !== null) { 
-        tr = csvTable.table.getElementsByTagName("tr");
         var tableDataCopy = tableData;
         if (viewMode.value === "table-all") {     
             csvTable.update(tableData[0], tableData.slice(1));
             tableData = tableDataCopy;
-            /* for (j = 0; j < tr.length; j++) {
-                td = tr[j].getElementsByTagName("td")[0];
-                if (td) {
-                    tr[j].style.display = "";
-                }
-            } */
+            applySorting();
 
         } else if (viewMode.value === "table-head") {
             csvTable.update(tableData[0], tableData.slice(1, 11));
             tableData = tableDataCopy;
-            /* for (j = 0; j < tr.length; j++) {
-                td = tr[j].getElementsByTagName("td")[0];
-                if (td) {
-                    if (j <= tr.length - 11) {
-                        tr[j].style.display = "none";
-                    } else {
-                        tr[j].style.display = "";
-                    }
-                }
-            } */
+            applySorting();
 
         } else if (viewMode.value === "table-tail") {
             csvTable.update(tableData[0], tableData.slice(tableData.length - 11, tableData.length));
             tableData = tableDataCopy;
-            /* for (j = 0; j < tr.length; j++) {
-                td = tr[j].getElementsByTagName("td")[0];
-                if (td) {
-                    if (j >= 11) {
-                        tr[j].style.display = "none";
-                    } else {
-                        tr[j].style.display = "";
-                    }
-                }
-            } */
+            applySorting();
 
         } else if (viewMode.value === "table-preview") {
             var firstFive = tableData.slice(1, 6);
             var lastFive = tableData.slice(tableData.length - 6, tableData.length);
             csvTable.update(tableData[0], firstFive.concat(lastFive));
             tableData = tableDataCopy;
-            /* for (j = 0; j < tr.length; j++) {
-                td = tr[j].getElementsByTagName("td")[0];
-                if (td) {
-                    if (j >= tr.length - 5) {
-                        tr[j].style.display = "";
-                    } else if (j <= 5) {
-                        tr[j].style.display = "";
-                    } else {
-                        tr[j].style.display = "none";
-                    }
-                }
-            } */
+            applySorting();
         }
     }
 }
 viewMode.onchange = onChange_viewMode;
-onChange_viewMode();
 
 
 // Track the direction of sorting
